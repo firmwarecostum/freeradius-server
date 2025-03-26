@@ -1,0 +1,118 @@
+--- a/Make.inc.in
++++ b/Make.inc.in
+@@ -15,7 +15,7 @@ sbindir		= @sbindir@
+ docdir		= @docdir@
+ mandir		= @mandir@
+ datadir		= @datadir@
+-dictdir		= $(datadir)/freeradius
++dictdir		= @dictdir@
+ logdir		= @logdir@
+ includedir	= @includedir@
+ raddbdir	= @raddbdir@
+--- a/configure
++++ b/configure
+@@ -809,6 +809,7 @@ SNMPWALK
+ SNMPGET
+ PERL
+ openssl_version_check_config
++dictdir
+ raddbdir
+ radacctdir
+ logdir
+@@ -910,6 +911,7 @@ with_docdir
+ with_logdir
+ with_radacctdir
+ with_raddbdir
++with_dictdir
+ with_ascend_binary
+ with_threads
+ with_vmps
+@@ -1578,6 +1580,7 @@ Optional Packages:
+   --with-logdir=DIR       Directory for logfiles LOCALSTATEDIR/log/radius
+   --with-radacctdir=DIR   Directory for detail files LOGDIR/radacct
+   --with-raddbdir=DIR     Directory for config files SYSCONFDIR/raddb
++  --with-dictdir=DIR      directory for dictionary files DATAROOTDIR/freeradius
+   --with-ascend-binary    Include support for Ascend binary filter attributes (default=yes)
+   --with-threads          Use threads, if available.  (default=yes)
+   --with-vmps             Compile in VMPS support. (default=yes)
+@@ -19574,6 +19577,32 @@ fi
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: $raddbdir" >&5
+ $as_echo "$raddbdir" >&6; }
+ 
++dictdir='${datarootdir}/freeradius'
++ { $as_echo "$as_me:${as_lineno-$LINENO}: checking dictdir" >&5
++ $as_echo_n "checking dictdir... " >&6; }
++ 
++ # Check whether --with-dictdir was given.
++ if test "${with_dictdir+set}" = set; then :
++   withval=$with_dictdir;  case "$withval" in
++   no)
++     as_fn_error $? "Need dictdir" "$LINENO" 5
++     ;;
++   yes)
++     ;;
++   [\\/$]* | ?:[\\/]* )
++     dictdir="$withval"
++     ;;
++   *)
++     as_fn_error $? "expected an absolute directory name for --with-dictdir: $withval" "$LINENO" 5
++     ;;
++   esac
++ 
++ fi
++ 
++ 
++ { $as_echo "$as_me:${as_lineno-$LINENO}: result: $dictdir" >&5
++ $as_echo "$dictdir" >&6; }
++
+ ASCEND_BINARY=yes
+ 
+ # Check whether --with-ascend-binary was given.
+--- a/configure.in
++++ b/configure.in
+@@ -235,6 +235,28 @@ AC_ARG_WITH(raddbdir,
+ AC_SUBST(raddbdir)
+ AC_MSG_RESULT($raddbdir)
+ 
++ dnl extra argument: --with-dictdir
++ dictdir='${datarootdir}/freeradius'
++ AC_MSG_CHECKING(dictdir)
++ AC_ARG_WITH(dictdir,
++ [  --with-dictdir=DIR      directory for dictionary files [DATAROOTDIR/freeradius] ],
++ [ case "$withval" in
++   no)
++     AC_MSG_ERROR([Need dictdir])
++     ;;
++   yes)
++     ;;
++   [[\\/$]]* | ?:[[\\/]]* )
++     dictdir="$withval"
++     ;;
++   *)
++     AC_MSG_ERROR([expected an absolute directory name for --with-dictdir: $withval])
++     ;;
++   esac ]
++ )
++ AC_SUBST(dictdir)
++ AC_MSG_RESULT($dictdir)
++
+ dnl extra argument: --with-ascend-binary
+ ASCEND_BINARY=yes
+ AC_ARG_WITH(ascend-binary,
+--- a/src/include/build-radpaths-h.in
++++ b/src/include/build-radpaths-h.in
+@@ -20,6 +20,7 @@ sbindir=@sbindir@
+ mandir=@mandir@
+ logdir=@logdir@
+ raddbdir=@raddbdir@
++dictdir=@dictdir@
+ radacctdir=@radacctdir@
+ datarootdir=@datarootdir@
+ 
+@@ -30,5 +31,6 @@ cat <<EOF > radpaths.h
+ #define RUNDIR		"@localstatedir@/run"
+ #define SBINDIR		"@sbindir@"
+ #define RADIR		"@radacctdir@"
++#define DICTDIR		"@dictdir@"
+ EOF
+ 
