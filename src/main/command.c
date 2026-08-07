@@ -42,6 +42,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <ctype.h>
+#include <unistd.h>
 
 typedef struct fr_command_table_t fr_command_table_t;
 
